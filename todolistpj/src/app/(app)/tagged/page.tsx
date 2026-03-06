@@ -38,7 +38,7 @@ export default function TaggedPage() {
       setTasks((data || []).map((t: any) => ({
         ...t,
         assignees: t.assignees?.map((a: any) => a.profile).filter(Boolean) || [],
-      }))
+      })))
       setLoading(false)
     }
     fetchTaggedTasks()
@@ -65,7 +65,7 @@ export default function TaggedPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {tasks.map((task) => {
-              const isOverdue = task.due_date && isPast(new Date(task.due_date)) && \!isToday(new Date(task.due_date)) && task.status \!== 'done'
+              const isOverdue = task.due_date && isPast(new Date(task.due_date)) && !isToday(new Date(task.due_date)) && task.status !== 'done'
               const isDone = task.status === 'done'
               return (
                 <div key={task.id} className={"bg-white rounded-xl border shadow-sm p-4 " + (isOverdue ? "border-red-200" : "border-[#e2e8f0]")}>

@@ -20,8 +20,8 @@ function Avatar({ name, size = 36 }: { name: string; size?: number }) {
 
 export default function FriendsPage() {
   const {
-    friends, pendingReceived, pendingSent, myProfile, loading,
-    sendFriendRequest, acceptRequest, rejectRequest, removeFriend,
+    friends, pendingIncoming, pendingSent, myProfile, loading,
+    addFriend, acceptRequest, rejectRequest, removeFriend,
   } = useFriends()
 
   const [addOpen, setAddOpen] = useState(false)
@@ -42,7 +42,7 @@ export default function FriendsPage() {
     if (!codeInput.trim()) return
     setSubmitting(true)
     setAddError('')
-    const { error } = await sendFriendRequest(codeInput)
+    const error = await addFriend(codeInput)
     if (error) {
       setAddError(error)
     } else {
@@ -88,14 +88,14 @@ export default function FriendsPage() {
         </button>
 
         {/* Pending Received Requests */}
-        {pendingReceived.length > 0 && (
+        {pendingIncoming.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-[#334155] mb-3 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-              คำขอเพื่อนที่รอตอบรับ ({pendingReceived.length})
+              คำขอเพื่อนที่รอตอบรับ ({pendingIncoming.length})
             </h2>
             <div className="space-y-2">
-              {pendingReceived.map((req) => {
+              {pendingIncoming.map((req) => {
                 const p = req.requester
                 const name = p?.display_name || p?.email?.split('@')[0] || 'ไม่ทราบชื่อ'
                 return (
@@ -124,7 +124,7 @@ export default function FriendsPage() {
             <h2 className="text-sm font-semibold text-[#334155] mb-3">คำขอที่ส่งออก ({pendingSent.length})</h2>
             <div className="space-y-2">
               {pendingSent.map((req) => {
-                const p = req.receiver
+                const p = req.profile
                 const name = p?.display_name || p?.email?.split('@')[0] || 'ไม่ทราบชื่อ'
                 return (
                   <div key={req.id} className="flex items-center gap-3 bg-white border border-[#e2e8f0] rounded-xl px-4 py-3 opacity-80">
@@ -159,17 +159,17 @@ export default function FriendsPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {friends.map(({ requestId, profile }) => {
+              {friends.map(({ id, profile }) => {
                 const name = profile.display_name || profile.email.split('@')[0]
                 return (
-                  <div key={requestId} className="flex items-center gap-3 bg-white border border-[#e2e8f0] rounded-xl px-4 py-3">
+                  <div key={id} className="flex items-center gap-3 bg-white border border-[#e2e8f0] rounded-xl px-4 py-3">
                     <Avatar name={name} size={40} />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[#0f172a] truncate">{name}</p>
                       <p className="text-xs text-[#94a3b8] truncate">{profile.email}</p>
                     </div>
                     <span className="text-xs font-mono text-[#64748b] bg-slate-100 px-2 py-1 rounded-lg">{profile.friend_code}</span>
-                    <button onClick={() => removeFriend(requestId)} className="p-1.5 text-[#94a3b8] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="ลบเพื่อน">
+                    <button onClick={() => removeFriend(id)} className="p-1.5 text-[#94a3b8] hover:text-red-500 transition-colors rounded-lg hover:bg-red-50" title="ลบเพื่อน">
                       <X size={16} />
                     </button>
                   </div>
