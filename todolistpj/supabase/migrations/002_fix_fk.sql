@@ -7,12 +7,13 @@
 -- A) task_assignees.user_id → profiles(id)  (แทน auth.users)
 --    PostgREST ต้องการ FK ตรง ไปยัง profiles ถึงจะ join ได้
 -- ----------------------------------------------------------------
-ALTER TABLE public.task_assignees
-  DROP CONSTRAINT IF EXISTS task_assignees_user_id_fkey;
-
-ALTER TABLE public.task_assignees
-  ADD CONSTRAINT task_assignees_user_id_fkey
-  FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+-- REMOVED: Merged into 001
+-- ALTER TABLE public.task_assignees
+--   DROP CONSTRAINT IF EXISTS task_assignees_user_id_fkey;
+--
+-- ALTER TABLE public.task_assignees
+--   ADD CONSTRAINT task_assignees_user_id_fkey
+--   FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
 
 -- ----------------------------------------------------------------
 -- B) สร้าง friendships table (code ใช้ชื่อนี้)

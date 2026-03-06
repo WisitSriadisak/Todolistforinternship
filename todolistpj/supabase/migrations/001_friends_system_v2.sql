@@ -14,15 +14,12 @@ create table if not exists profiles (
 
 alter table profiles enable row level security;
 
-drop policy if exists "profiles_select" on profiles;
 create policy "profiles_select" on profiles
   for select to authenticated using (true);
 
-drop policy if exists "profiles_insert" on profiles;
 create policy "profiles_insert" on profiles
   for insert to authenticated with check (auth.uid() = id);
 
-drop policy if exists "profiles_update" on profiles;
 create policy "profiles_update" on profiles
   for update to authenticated using (auth.uid() = id);
 
