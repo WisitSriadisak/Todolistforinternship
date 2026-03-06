@@ -1,18 +1,23 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Kanit } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const kanit = Kanit({
+  subsets: ['thai', 'latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-kanit',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'TaskFlow',
-  description: 'Todo app with categories, tags, and dashboard',
+  title: 'To Do List By Wisit',
+  description: 'Todo app with categories, friends, and dashboard',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="th">
-      <body className={inter.className}>{children}</body>
+      <body className={`${kanit.className} bg-white`}>{children}</body>
     </html>
   )
 }

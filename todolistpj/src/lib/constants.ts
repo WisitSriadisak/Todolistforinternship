@@ -25,3 +25,12 @@ export const PRIORITY_COLORS = {
   high:   '#f97316',
   urgent: '#dc2626',
 }
+
+export const DEFAULT_USERS = [
+  '@alice', '@bob', '@charlie', '@dave', '@eve', '@frank',
+]
+
+export const CATEGORY_PRESET_COLORS = [
+  '#6366f1', '#ec4899', '#14b8a6', '#f59e0b',
+  '#8b5cf6', '#10b981', '#ef4444', '#3b82f6',
+]

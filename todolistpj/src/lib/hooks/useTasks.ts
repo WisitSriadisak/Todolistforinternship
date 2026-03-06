@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Task, TaskFilters } from '@/types'
+import type { Task, TaskFilters, TaskInput, Profile } from '@/types'
 
 export function useTasks(filters: TaskFilters) {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -12,7 +12,7 @@ export function useTasks(filters: TaskFilters) {
     setLoading(true)
     let query = supabase
       .from('tasks')
-      .select(`*, category:categories(id,name,color), assignees:task_assignees(user_tag)`)
+      .select(`*, category:categories(id,name,color), assignees:task_assignees(user_id, profile:profiles(id,email,display_name,friend_code))`)
 
     if (filters.status !== 'all')      query = query.eq('status', filters.status)
     if (filters.category_id !== 'all') query = query.eq('category_id', filters.category_id)
@@ -27,31 +27,35 @@ export function useTasks(filters: TaskFilters) {
 
     setTasks((data || []).map(t => ({
       ...t,
-      assignees: t.assignees?.map((a: any) => a.user_tag) || []
+      assignees: (t.assignees || []).map((a: any) => a.profile).filter(Boolean) as Profile[]
     })))
     setLoading(false)
-  }, [filters])
+  }, [filters]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 
-  async function createTask(input: Partial<Task> & { assignees?: string[] }) {
+  async function createTask(input: TaskInput) {
     const { data: { user } } = await supabase.auth.getUser()
-    const { assignees = [], ...taskData } = input
+    const { assignee_ids = [], ...taskData } = input
     const { data: task } = await supabase.from('tasks')
       .insert({ ...taskData, user_id: user!.id }).select().single()
-    if (task && assignees.length > 0) {
-      await supabase.from('task_assignees').insert(assignees.map(u => ({ task_id: task.id, user_tag: u })))
+    if (task && assignee_ids.length > 0) {
+      await supabase.from('task_assignees')
+        .insert(assignee_ids.map(uid => ({ task_id: task.id, user_id: uid })))
     }
     fetchTasks()
   }
 
-  async function updateTask(id: string, updates: Partial<Task> & { assignees?: string[] }) {
-    const { assignees, ...taskData } = updates
-    await supabase.from('tasks').update(taskData).eq('id', id)
-    if (assignees !== undefined) {
+  async function updateTask(id: string, updates: Partial<TaskInput>) {
+    const { assignee_ids, ...taskData } = updates
+    if (Object.keys(taskData).length > 0) {
+      await supabase.from('tasks').update(taskData).eq('id', id)
+    }
+    if (assignee_ids !== undefined) {
       await supabase.from('task_assignees').delete().eq('task_id', id)
-      if (assignees.length > 0)
-        await supabase.from('task_assignees').insert(assignees.map(u => ({ task_id: id, user_tag: u })))
+      if (assignee_ids.length > 0)
+        await supabase.from('task_assignees')
+          .insert(assignee_ids.map(uid => ({ task_id: id, user_id: uid })))
     }
     fetchTasks()
   }
